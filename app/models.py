@@ -36,5 +36,11 @@ class UserProfile(db.Model):
         except NameError:
             return str(self.id)  # python 3 support
 
+    def get_pword(self):
+        try:
+            return unicode(self.password)  # python 2 support
+        except NameError:
+            return str(self.password)  # python 3 support
+
     def __repr__(self):
         return '<User %r>' % (self.username)

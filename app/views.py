@@ -3,8 +3,9 @@ from app import app, db, login_manager
 from flask import render_template, request, redirect, url_for, flash, session, abort
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.utils import secure_filename
-from app.models import UserProfile
+from app.models import UserProfile##THIS##
 from app.forms import LoginForm
+from werkzeug.security import check_password_hash
 
 
 ###
@@ -26,6 +27,7 @@ def about():
 @app.route('/upload', methods=['POST', 'GET'])
 def upload():
     # Instantiate your form class
+    form = LoginForm()
 
     # Validate file upload on submit
     if form.validate_on_submit():
@@ -43,7 +45,15 @@ def login():
 
     # change this to actually validate the entire form submission
     # and not just one field
-    if form.username.data:
+    if form.validate_on_submit():
+        name=form.username.data
+        pword=form.password.data
+        user=db.session.execute(db.select(UserProfile).filter_by(username=name,password=pword)).first()
+        pwhash=user.password
+        
+        #user=db.get_or_404(db.select(UserProfile).filter_by(username=name,password=pword))
+        #bool=check_password_hash(,pword)
+        if (check_password_hash(pwhash, pword)and(user)):
         # Get the username and password values from the form.
 
         # Using your model, query database for a user based on the username
@@ -53,10 +63,12 @@ def login():
         # passed to the login_user() method below.
 
         # Gets user id, load into session
-        login_user(user)
+            login_user(user)
 
         # Remember to flash a message to the user
-        return redirect(url_for("home"))  # The user should be redirected to the upload form instead
+            flash("You have successfully logged in.")
+            return redirect(url_for("upload"))  # The user should be redirected to the upload form instead
+            
     return render_template("login.html", form=form)
 
 # user_loader callback. This callback is used to reload the user object from

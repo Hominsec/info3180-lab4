@@ -4,7 +4,7 @@ from flask import render_template, request, redirect, url_for, flash, session, a
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.utils import secure_filename
 from app.models import UserProfile##THIS##
-from app.forms import LoginForm
+from app.forms import LoginForm, UploadForm
 from werkzeug.security import check_password_hash
 
 
@@ -25,18 +25,32 @@ def about():
 
 
 @app.route('/upload', methods=['POST', 'GET'])
+@login_required
 def upload():
     # Instantiate your form class
-    form = LoginForm()
+    form = UploadForm()
+
+    if request.method == 'GET':
+        photo=form.photo.data
+
+        #filename=secure_filename(photo.filename)
+        #photo.save(os.path.join( app.config['UPLOAD_FOLDER'], filename ))
+        return render_template('upload.html',form=form)
+    elif request.method == 'POST':
+        if form.validate_on_submit():
+            photo=form.photo.data
+
+            filename=secure_filename(photo.filename)
+            photo.save(os.path.join( app.config['UPLOAD_FOLDER'], filename ))
+            # Get file data and save to your uploads folder
+            flash('File Saved', 'success')
+            return redirect(url_for('home')) # Update this to redirect the user to a route that displays all uploaded image files
+        return render_template('upload.html')
 
     # Validate file upload on submit
-    if form.validate_on_submit():
-        # Get file data and save to your uploads folder
+    
+    
 
-        flash('File Saved', 'success')
-        return redirect(url_for('home')) # Update this to redirect the user to a route that displays all uploaded image files
-
-    return render_template('upload.html')
 
 
 @app.route('/login', methods=['POST', 'GET'])
@@ -48,8 +62,10 @@ def login():
     if form.validate_on_submit():
         name=form.username.data
         pword=form.password.data
-        user=db.session.execute(db.select(UserProfile).filter_by(username=name,password=pword)).first()
+        #user=db.session.execute(db.select(UserProfile).filter_by(username=name,password=pword)).first()
+        user=db.session.execute(db.select(UserProfile).filter_by(username=name)).scalar()
         pwhash=user.password
+        #pwhash=user.get_pword()
         
         #user=db.get_or_404(db.select(UserProfile).filter_by(username=name,password=pword))
         #bool=check_password_hash(,pword)

@@ -18,3 +18,13 @@ body {
     border-top-left-radius: 0;
     border-top-right-radius: 0;
 }
+
+.image-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+.image-container > div {
+    margin: 10px;
+}

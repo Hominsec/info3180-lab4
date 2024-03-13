@@ -3,9 +3,11 @@
 {% block main %}
 <h1 class="page-header">INFO3180 Lab 4</h1>
 {% include 'flash_messages.html' %}
-<ul>
+<div class="image-container">
     {% for image in images %}
-    <li><img src="{{ url_for('get_image',filename=image)}}"alt="RAND" width="200" height="200"></li>
+    <div>
+        <img src="{{ url_for('get_image', filename=image) }}" alt="RAND" width="300" height="250">
+    </div>
     {% endfor %}
-</ul>
+</div>
 {% endblock %}

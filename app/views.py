@@ -73,7 +73,11 @@ def upload():
     
     
 
-
+@app.route('/logout', methods=['POST', 'GET'])
+def logout():
+    logout_user()
+    flash('Logout Successfully!')
+    return redirect(url_for('home'))
 
 @app.route('/login', methods=['POST', 'GET'])
 def login():
